@@ -13,16 +13,10 @@
 .textos-cabecera h2 {
   font-size: 22px;
   color: #2b332d;
-  margin: 0 0 4px 0;
-}
-
-.textos-cabecera p {
-  font-size: 13px;
-  color: #7a857a;
   margin: 0;
 }
 
-/* Botón café */
+/* Boton cafe */
 .btn-primario-cafe {
   background-color: #6f4e37;
   color: white;
@@ -39,11 +33,13 @@
   background-color: #5a3f2d;
 }
 
+/* Tabla de inventario delineada con verde obscuro */
 .contenedor-tabla {
   background-color: white;
   border-radius: 6px;
-  border: 1px solid #e0e5e1;
+  border: 2px solid #1e3d24;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(30, 61, 36, 0.08);
 }
 
 .tabla-datos {
@@ -53,18 +49,81 @@
 }
 
 .tabla-datos th {
-  background-color: #eef2ef;
+  background-color: #2e4a32;
+  color: #ffffff;
   padding: 14px 20px;
   font-size: 13px;
-  color: #3b423d;
   font-weight: 600;
+  border-bottom: 2px solid #1e3d24;
 }
 
 .tabla-datos td {
   padding: 16px 20px;
   font-size: 13.5px;
-  color: #556255;
-  border-top: 1px solid #f0f2f0;
+  color: #2b332d;
+  border-top: 1px solid #c8d6cb;
+}
+
+.tabla-datos tbody tr:hover {
+  background-color: #f4f7f4;
+}
+
+.seccion-distribuidores {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.encabezado-seccion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.encabezado-seccion h3 {
+  margin: 0 0 4px;
+  color: #2b332d;
+  font-size: 18px;
+}
+
+.encabezado-seccion p {
+  margin: 0;
+  color: #7a857a;
+  font-size: 13px;
+}
+
+.tabla-vacia {
+  padding: 20px;
+  color: #8d6e63;
+  text-align: center;
+}
+
+.modal-distribuidor {
+  max-width: 420px;
+}
+
+.acciones-inventario {
+  white-space: nowrap;
+}
+
+.acciones-inventario button {
+  border: 0;
+  padding: 6px 9px;
+  margin-right: 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-editar {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.btn-eliminar {
+  background-color: #ffebee;
+  color: #c62828;
 }
 
 .etiqueta {
@@ -85,4 +144,119 @@
   background-color: #fff3e0; 
   color: #ef6c00; 
   border-color: #ffe0b2;
+}
+
+.etiqueta.roja {
+  background-color: #ffebee;
+  color: #c62828;
+  border-color: #ffcdd2;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-contenido {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 480px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.modal-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f2f0;
+  padding-bottom: 12px;
+}
+
+.modal-cabecera h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #2b332d;
+}
+
+.btn-cerrar-x {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #7a857a;
+  cursor: pointer;
+}
+
+.form-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-grupo label {
+  font-size: 13px;
+  color: #2b332d;
+  font-weight: 500;
+}
+
+.form-grupo input, .form-grupo select {
+  padding: 8px 12px;
+  border: 1px solid #e0e5e1;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.form-grupo input:focus, .form-grupo select:focus {
+  outline: none;
+  border-color: #1e3d24;
+}
+
+.modal-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f2f0;
+}
+
+.btn-cancelar {
+  background-color: white;
+  border: 1px solid #e0e5e1;
+  color: #556255;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-guardar {
+  background-color: #6f4e37;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.form-error-alert {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #ffcdd2;
 }

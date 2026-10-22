@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const productoService = require('../services/producto.service');
+const { exigirSesion, soloPara } = require('../middleware/auth');
 
 router.get('/', (req, res) => {
     productoService.obtenerProductos((error, productos) => {
@@ -24,7 +25,7 @@ function validarNumero(num) {
     return null;
 }
 
-router.post('/', (req, res) => {
+router.post('/', exigirSesion, soloPara('administrador'), (req, res) => {
     const { nombre, categoria, precio } = req.body;
     const errNombre = validarTexto(nombre, 50);
     if (errNombre) return res.status(400).json({ mensaje: `Nombre: ${errNombre}` });
@@ -43,7 +44,7 @@ router.post('/', (req, res) => {
     });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', exigirSesion, soloPara('administrador'), (req, res) => {
     productoService.editarProducto(req.params.id, req.body, (error, producto) => {
         if (error) {
             return res.status(500).json({ mensaje: 'Error al editar producto' });
@@ -52,7 +53,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', exigirSesion, soloPara('administrador'), (req, res) => {
     productoService.eliminarProducto(req.params.id, (error, resultado) => {
         if (error) {
             return res.status(500).json({ mensaje: 'Error al eliminar producto' });

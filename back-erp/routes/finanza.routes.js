@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const finanzaService = require('../services/finanza.service');
+const { exigirSesion, soloPara } = require('../middleware/auth');
+
+router.use(exigirSesion, soloPara('administrador'));
 
 router.get('/resumen', (req, res) => {
     finanzaService.obtenerResumen((error, resumen) => {

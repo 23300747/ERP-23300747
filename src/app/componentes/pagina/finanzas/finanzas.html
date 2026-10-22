@@ -10,18 +10,24 @@
     </div>
   </div>
 
-  <div class="tarjetas-resumen">
-    <div class="tarjeta-blanca">
-      <h3>{{ resumen.ingresosMes }}</h3>
-      <span>Ingresos del mes</span>
+  <div class="cuadro-resta-balance">
+    <div class="bloque-resta">
+      <span class="etiqueta-operacion">Ingresos del mes</span>
+      <h3 class="monto-operacion ingreso">{{ resumen.ingresosMes }}</h3>
     </div>
-    <div class="tarjeta-blanca">
-      <h3>{{ resumen.egresosMes }}</h3>
-      <span>Egresos del mes</span>
+
+    <div class="signo-operacion">−</div>
+
+    <div class="bloque-resta">
+      <span class="etiqueta-operacion">Egresos del mes</span>
+      <h3 class="monto-operacion egreso">{{ resumen.egresosMes }}</h3>
     </div>
-    <div class="tarjeta-blanca">
-      <h3 class="texto-verde">{{ resumen.utilidadNeta }}</h3>
-      <span>Utilidad neta</span>
+
+    <div class="signo-operacion">=</div>
+
+    <div class="bloque-resta">
+      <span class="etiqueta-operacion">Utilidad neta</span>
+      <h3 class="monto-operacion utilidad">{{ resumen.utilidadNeta }}</h3>
     </div>
   </div>
 

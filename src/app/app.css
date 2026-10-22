@@ -267,3 +267,232 @@
   opacity: 0.65;
   cursor: not-allowed;
 }
+
+/* Barra superior de usuario y carrito */
+.usuario-barra-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.saludo-usuario {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-rol {
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.badge-rol.admin {
+  background-color: #ffd54f;
+  color: #3e2723;
+}
+
+.badge-rol.cliente {
+  background-color: #81c784;
+  color: #1b5e20;
+}
+
+.btn-carrito-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s;
+}
+
+.btn-carrito-nav:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.badge-carrito {
+  background-color: #e53935;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.badge-sidebar {
+  background-color: #e53935;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+/* Estilos de Documentos Legales (Terminos y Privacidad) */
+.sidebar-legal-links {
+  margin-top: auto;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-top: 1px solid #e0e5e1;
+  font-size: 11px;
+}
+
+.login-footer-legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  font-size: 12px;
+}
+
+.btn-legal-link {
+  background: none;
+  border: none;
+  color: #556255;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-size: inherit;
+  transition: color 0.2s;
+}
+
+.btn-legal-link:hover {
+  color: #2e3b2e;
+}
+
+.separador-legal {
+  color: #aaa;
+}
+
+.modal-legal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+.modal-legal-card {
+  background: #ffffff;
+  width: 90%;
+  max-width: 650px;
+  max-height: 85vh;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-legal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-legal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.btn-cerrar-legal {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #777;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+.btn-cerrar-legal:hover {
+  color: #000;
+  background-color: #f0f0f0;
+}
+
+.modal-legal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  line-height: 1.6;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.modal-legal-body h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  font-size: 1.05rem;
+  color: #222;
+}
+
+.modal-legal-body p {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+}
+
+.modal-legal-body .muted {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.legal-toggle {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #ccc;
+}
+
+.btn-subrayado {
+  background: none;
+  border: none;
+  color: #2a6496;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-weight: 500;
+}
+
+.modal-legal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  background-color: #fbfbfb;
+}
+
+.btn-entendido {
+  background-color: #556255;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-entendido:hover {
+  background-color: #434e43;
+}

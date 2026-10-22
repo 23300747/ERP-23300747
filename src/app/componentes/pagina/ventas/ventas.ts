@@ -1,6 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { VentaService } from '../../../servicios/venta.service';
 import { ProductoService } from '../../../servicios/producto.service';
+import { AuthService } from '../../../servicios/auth.service';
 import { validarTexto, validarNumero } from '../../../servicios/http-cliente';
 
 export interface ResumenVentas {
@@ -20,12 +22,18 @@ export interface Venta {
 }
 
 @Component({
-  imports: [],
   selector: 'app-ventas',
+  standalone: true,
+  imports: [CommonModule],
   styleUrl: './ventas.css',
   templateUrl: './ventas.html',
 })
 export class Ventas implements OnInit {
+  protected readonly authService = inject(AuthService);
+  private readonly ventaService = inject(VentaService);
+  private readonly productoService = inject(ProductoService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   // Resumen diario y listado de ventas realizadas
   resumen: ResumenVentas = {
     ventasHoy: 0,
@@ -44,30 +52,29 @@ export class Ventas implements OnInit {
   formCantidad: string = '';
   formPrecioUnitario: string = '';
 
-  constructor(
-    private ventaService: VentaService,
-    private productoService: ProductoService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  // Encargado de consultar y mostrar la factura XML de una venta
+  mostrarModalFactura = false;
+  facturaSeleccionada: any = null;
 
-  // Encargado de consultar ventas y productos al iniciar
   ngOnInit(): void {
     this.cargarDatos();
   }
 
   esAdmin(): boolean {
-    return localStorage.getItem('rol') === 'administrador';
+    return this.authService.esAdmin();
   }
 
   cargarDatos(): void {
-    this.ventaService.obtenerResumen((error, datos) => {
-      if (!error && datos) {
-        this.resumen = datos;
-        this.cdr.detectChanges();
-      }
-    });
+    if (this.esAdmin()) {
+      this.ventaService.obtenerResumen((error, datos) => {
+        if (!error && datos) {
+          this.resumen = datos;
+          this.cdr.detectChanges();
+        }
+      });
+    }
 
-    const propioId = this.esAdmin() ? undefined : Number(localStorage.getItem('usuarioId')) || undefined;
+    const propioId = this.esAdmin() ? undefined : (this.authService.obtenerUsuarioId() ?? undefined);
     this.ventaService.obtenerVentas((error, datos) => {
       if (!error && datos) {
         this.ventas = datos;
@@ -75,15 +82,16 @@ export class Ventas implements OnInit {
       }
     }, propioId);
 
-    this.productoService.obtenerProductos((error, datos) => {
-      if (!error && datos) {
-        this.productosLista = datos;
-        this.cdr.detectChanges();
-      }
-    });
+    if (this.esAdmin()) {
+      this.productoService.obtenerProductos((error, datos) => {
+        if (!error && datos) {
+          this.productosLista = datos;
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
 
-  // Encargado de abrir y cerrar la ventana de venta
   abrirModal(): void {
     this.formNombreCliente = 'Público general';
     this.formProductoId = '';
@@ -101,11 +109,8 @@ export class Ventas implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // Encargado de consultar y mostrar la factura XML de una venta
-  mostrarModalFactura = false;
-  facturaSeleccionada: any = null;
-
   verFactura(item: Venta): void {
+    const clienteId = this.esAdmin() ? undefined : this.authService.obtenerUsuarioId();
     this.ventaService.obtenerFactura(Number(item.folio), (error, datos) => {
       if (error || !datos) {
         alert('No se encontró la factura XML para este folio');
@@ -114,13 +119,32 @@ export class Ventas implements OnInit {
       this.facturaSeleccionada = datos;
       this.mostrarModalFactura = true;
       this.cdr.detectChanges();
-    });
+    }, clienteId);
   }
 
   cerrarModalFactura(): void {
     this.mostrarModalFactura = false;
     this.facturaSeleccionada = null;
     this.cdr.detectChanges();
+  }
+
+  // Descarga del archivo XML comercial (CFDI 4.0) (RQF30)
+  descargarXML(): void {
+    if (!this.facturaSeleccionada || !this.facturaSeleccionada.archivo_xml) {
+      alert('No hay archivo XML disponible para descargar');
+      return;
+    }
+
+    const contenido = this.facturaSeleccionada.archivo_xml;
+    const blob = new Blob([contenido], { type: 'application/xml;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Factura-Folio-${this.facturaSeleccionada.venta_id || 'CFDI'}.xml`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   guardarVenta(): void {

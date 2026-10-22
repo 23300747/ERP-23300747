@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const empleadoService = require('../services/empleado.service');
+const { exigirSesion, soloPara } = require('../middleware/auth');
+
+router.use(exigirSesion, soloPara('administrador'));
 
 router.get('/', (req, res) => {
     empleadoService.obtenerEmpleados((error, empleados) => {

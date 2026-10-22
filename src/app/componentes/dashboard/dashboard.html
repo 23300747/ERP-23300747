@@ -4,21 +4,21 @@
     <p>Resumen general del sistema de la cafetería</p>
   </div>
 
-  <div class="grid-tarjetas">
+  <div class="recuadro-unico">
     @for (tarjeta of tarjetas; track tarjeta.id) {
-      <div class="tarjeta">
-        <div class="icono-tarjeta">
-          @if (tarjeta.esImagen) {
-            <img [src]="tarjeta.icono" [alt]="tarjeta.titulo">
-          } @else {
-            <span>{{ tarjeta.icono }}</span>
-          }
+      <div class="fila-dashboard">
+        <div class="info-seccion">
+          <div class="icono-tarjeta">
+            @if (tarjeta.esImagen) {
+              <img [src]="tarjeta.icono" [alt]="tarjeta.titulo">
+            } @else {
+              <span>{{ tarjeta.icono }}</span>
+            }
+          </div>
+          <h3>{{ tarjeta.titulo }}</h3>
         </div>
 
-        <h3>{{ tarjeta.titulo }}</h3>
-        <p class="subtitulo">{{ tarjeta.subtitulo }}</p>
-
-        <div class="metricas">
+        <div class="metricas-fila">
           <div class="dato">
             <h4>{{ tarjeta.metrica1.valor }}</h4>
             <span>{{ tarjeta.metrica1.etiqueta }}</span>

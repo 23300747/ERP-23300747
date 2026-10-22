@@ -15,20 +15,19 @@
 
       <div class="auth-cabecera">
         <h2>{{ !mostrarRegistro ? 'Inicio de Sesión' : 'Crear Cuenta' }}</h2>
-        <p>{{ !mostrarRegistro ? 'Accede con tu cuenta de administrador o empleado' : 'Registra un nuevo usuario para acceder al panel' }}</p>
+        <p>{{ !mostrarRegistro ? 'Accede con tu cuenta de administrador o cliente' : 'Registra un nuevo usuario para acceder' }}</p>
       </div>
 
-      <form class="auth-formulario" (submit)="$event.preventDefault(); enviar()">
-        @if (mostrarRegistro) {
-          <div class="auth-grupo">
-            <label>Nombre completo</label>
-            <input type="text" name="nombre" [value]="nombre" (input)="nombre = $any($event.target).value" placeholder="-------">
-          </div>
-        }
+      @if (mensajeError) {
+        <div class="auth-alerta error">
+          {{ mensajeError }}
+        </div>
+      }
 
+      <form class="auth-formulario" (submit)="$event.preventDefault(); enviar()">
         <div class="auth-grupo">
           <label>{{ !mostrarRegistro ? 'Correo institucional' : 'Correo electrónico' }}</label>
-          <input type="email" name="correo" [value]="correo" (input)="correo = $any($event.target).value" [placeholder]="!mostrarRegistro ? '-------@-----.com' : '-------@------.com'">
+          <input type="email" name="correo" [value]="correo" (input)="correo = $any($event.target).value" [placeholder]="!mostrarRegistro ? 'ejemplo@correo.com' : 'usuario@dominio.com'">
         </div>
 
         <div class="auth-grupo">
@@ -36,8 +35,8 @@
           <input type="password" name="contrasena" [value]="contrasena" (input)="contrasena = $any($event.target).value" placeholder="••••••••">
         </div>
 
-        <button type="submit" class="btn-auth">
-          {{ !mostrarRegistro ? 'Iniciar Sesión' : 'Crear Cuenta' }}
+        <button type="submit" class="btn-auth" [disabled]="cargando">
+          {{ cargando ? 'Cargando...' : (!mostrarRegistro ? 'Iniciar Sesión' : 'Crear Cuenta') }}
         </button>
       </form>
 

@@ -3,7 +3,7 @@ const db = require('../config/db');
 // checa credenciales
 function iniciarSesion(correo, contrasena, callback) {
     db.query(
-        'SELECT id, nombre, correo FROM administrador WHERE correo = ? AND contrasena = ?',
+        'SELECT id, correo FROM administrador WHERE correo = ? AND contrasena = ?',
         [correo, contrasena],
         (error, admins) => {
             if (error) {
@@ -16,7 +16,7 @@ function iniciarSesion(correo, contrasena, callback) {
             }
 
             db.query(
-                'SELECT id, nombre, correo FROM cliente WHERE correo = ? AND contrasena = ?',
+                'SELECT id, correo FROM cliente WHERE correo = ? AND contrasena = ?',
                 [correo, contrasena],
                 (error, clientes) => {
                     if (error) {
@@ -36,16 +36,16 @@ function iniciarSesion(correo, contrasena, callback) {
 
 // Nueva cuenta
 function registrarCliente(datos, callback) {
-    const { nombre, correo, contrasena, telefono, direccion } = datos;
+    const { correo, contrasena } = datos;
     db.query(
-        'INSERT INTO cliente (nombre, correo, contrasena, telefono, direccion) VALUES (?, ?, ?, ?, ?)',
-        [nombre, correo, contrasena, telefono, direccion],
+        'INSERT INTO cliente (correo, contrasena) VALUES (?, ?)',
+        [correo, contrasena],
         (error, resultado) => {
             if (error) {
                 callback(error, null);
                 return;
             }
-            callback(null, { id: resultado.insertId, nombre, correo });
+            callback(null, { id: resultado.insertId, correo });
         }
     );
 }

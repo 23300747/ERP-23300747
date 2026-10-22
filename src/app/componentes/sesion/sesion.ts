@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { SesionService } from '../../servicios/sesion.service';
+import { AuthService } from '../../servicios/auth.service';
+import { validarCorreo, validarTexto } from '../../servicios/http-cliente';
 
 @Component({
   imports: [],
@@ -9,51 +10,73 @@ import { SesionService } from '../../servicios/sesion.service';
   templateUrl: './sesion.html',
 })
 export class Sesion {
-  // Datos del formulario de login y registro
   mostrarRegistro = false;
+  cargando = false;
+  mensajeError = '';
 
-  nombre = '';
   correo = '';
   contrasena = '';
 
   constructor(
-    private sesionService: SesionService,
-    private router: Router
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  // Alterna entre la vista de iniciar sesión y crear cuenta
   alternarVista(): void {
     this.mostrarRegistro = !this.mostrarRegistro;
+    this.mensajeError = '';
+    this.cdr.detectChanges();
   }
 
   enviar(): void {
+    if (this.cargando) return;
+    this.mensajeError = '';
+
+    const errCorreo = validarCorreo(this.correo);
+    if (errCorreo) {
+      this.mensajeError = errCorreo;
+      return;
+    }
+
+    const errContrasena = validarTexto(this.contrasena, 100);
+    if (errContrasena) {
+      this.mensajeError = `Contraseña: ${errContrasena}`;
+      return;
+    }
+
     if (this.mostrarRegistro) {
-      this.sesionService.registrarCliente(
-        { nombre: this.nombre, correo: this.correo, contrasena: this.contrasena },
+      this.cargando = true;
+      this.authService.registrarCliente(
+        { correo: this.correo, contrasena: this.contrasena },
         (error) => {
+          this.cargando = false;
           if (error) {
-            console.error('Error al registrar cliente:', error);
-            alert('No se pudo registrar la cuenta');
+            this.mensajeError = error.mensaje || 'No se pudo registrar la cuenta';
+            this.cdr.detectChanges();
             return;
           }
           this.mostrarRegistro = false;
+          this.cdr.detectChanges();
         }
       );
       return;
     }
 
-    this.sesionService.iniciarSesion(this.correo, this.contrasena, (error, resultado) => {
+    this.cargando = true;
+    this.authService.iniciarSesion(this.correo, this.contrasena, (error, resultado) => {
+      this.cargando = false;
       if (error) {
-        console.error('Error al iniciar sesion:', error);
-        alert('No se pudo iniciar sesión');
+        this.mensajeError = error.mensaje || 'Error al iniciar sesión';
+        this.cdr.detectChanges();
         return;
       }
+
       if (resultado && resultado.existe) {
-        localStorage.setItem('rol', resultado.rol);
-        localStorage.setItem('usuarioId', String(resultado.usuario.id));
         this.router.navigate([resultado.rol === 'administrador' ? '/dashboard' : '/compras']);
       } else {
-        alert('Correo o contraseña incorrectos');
+        this.mensajeError = 'Correo o contraseña incorrectos';
+        this.cdr.detectChanges();
       }
     });
   }

@@ -39,12 +39,6 @@ export class Dashboard implements OnInit {
       metrica2: { valor: '$0.00', etiqueta: 'Total día' }
     },
     {
-      id: 'compras', titulo: 'Compras', subtitulo: 'Catálogo e insumos.',
-      icono: 'Compras.png', esImagen: true,
-      metrica1: { valor: '---', etiqueta: 'Proveedores' },
-      metrica2: { valor: '---', etiqueta: 'Órdenes' }
-    },
-    {
       id: 'rh', titulo: 'Recursos Humanos', subtitulo: 'Plantilla de personal.',
       icono: 'Usuario.png', esImagen: true,
       metrica1: { valor: '---', etiqueta: 'Empleados' },
@@ -67,7 +61,6 @@ export class Dashboard implements OnInit {
       this.actualizarTarjeta('finanzas', data.finanzas.ingresosMes, String(data.finanzas.reportes));
       this.actualizarTarjeta('inventario', String(data.inventario.productos), String(data.inventario.stockBajo));
       this.actualizarTarjeta('ventas', String(data.ventas.ventasHoy), data.ventas.totalDia);
-      this.actualizarTarjeta('compras', String(data.compras.proveedores), String(data.compras.ordenes));
       this.actualizarTarjeta('rh', String(data.rh.empleados), String(data.rh.turnosHoy));
       this.cdr.detectChanges();
     });

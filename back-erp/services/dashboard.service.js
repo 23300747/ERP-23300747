@@ -3,7 +3,7 @@ const db = require('../config/db');
 // junta los numeros que se muestran en las tarjetas del dashboard.
 function obtenerResumenDashboard(callback) {
     const resultado = {};
-    let pendientes = 5;
+    let pendientes = 4;
     let huboError = false;
 
     function terminarUno(error) {
@@ -19,7 +19,6 @@ function obtenerResumenDashboard(callback) {
                 finanzas: { ingresosMes: `$${Number(resultado.finanzas.ingresosMes).toFixed(2)}`, reportes: '---' },
                 inventario: { productos: resultado.inventario.totalProductos, stockBajo: resultado.inventario.stockBajo || 0 },
                 ventas: { ventasHoy: resultado.ventas.ventasHoy, totalDia: `$${Number(resultado.ventas.totalDia).toFixed(2)}` },
-                compras: { proveedores: resultado.compras.proveedores, ordenes: resultado.compras.ordenes },
                 rh: { empleados: resultado.rh.empleados, turnosHoy: resultado.rh.turnosHoy }
             });
         }
@@ -46,19 +45,12 @@ function obtenerResumenDashboard(callback) {
     );
 
     db.query(
-        `SELECT COUNT(*) AS ventasHoy, COALESCE(SUM(total), 0) AS totalDia FROM venta WHERE DATE(fecha) = CURDATE()`,
+        `SELECT COUNT(*) AS ventasHoy, COALESCE(SUM(monto), 0) AS totalDia
+         FROM movimiento_financiero
+         WHERE tipo_movimiento = 'ingreso' AND DATE(fecha) = CURDATE()`,
         (error, rows) => {
             if (error) return terminarUno(error);
             resultado.ventas = rows[0];
-            terminarUno(null);
-        }
-    );
-
-    db.query(
-        `SELECT (SELECT COUNT(*) FROM distribuidor) AS proveedores, (SELECT COUNT(*) FROM compra) AS ordenes`,
-        (error, rows) => {
-            if (error) return terminarUno(error);
-            resultado.compras = rows[0];
             terminarUno(null);
         }
     );

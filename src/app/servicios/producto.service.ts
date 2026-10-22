@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { API_URL } from './api-url';
 import { CallbackHttp, obtenerJSON, postJSON, putJSON, eliminarJSON } from './http-cliente';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
-  private readonly url = `${API_URL}/productos`;
+  private readonly url = 'http://localhost:3000/api/productos';
 
   obtenerProductos(callback: CallbackHttp): void {
     obtenerJSON(this.url, callback);

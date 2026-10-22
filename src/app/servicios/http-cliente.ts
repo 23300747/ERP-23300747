@@ -4,6 +4,10 @@ function peticion(metodo: string, url: string, datos: any, callback: CallbackHtt
   const xhr = new XMLHttpRequest();
   xhr.open(metodo, url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
+  const token = localStorage.getItem('token');
+  if (token) {
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+  }
 
   xhr.onload = function () {
     let cuerpo: any = null;

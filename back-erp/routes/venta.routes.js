@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ventaService = require('../services/venta.service');
+const { exigirSesion, soloPara } = require('../middleware/auth');
+
+router.use(exigirSesion, soloPara('administrador', 'cliente'));
 
 router.get('/resumen', (req, res) => {
     ventaService.obtenerResumenVentas((error, resumen) => {
@@ -23,16 +26,29 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     ventaService.crearVenta(req.body, (error, venta) => {
         if (error) {
-            return res.status(500).json({ mensaje: 'Error al registrar venta' });
+            return res.status(400).json({ mensaje: error.message || 'Error al registrar venta' });
         }
         res.status(201).json(venta);
     });
 });
 
+router.post('/validar-orden', (req, res) => {
+    const { items } = req.body;
+    ventaService.validarStockOrden(items, (error, calculo) => {
+        if (error) {
+            return res.status(400).json({ mensaje: error.message });
+        }
+        res.json(calculo);
+    });
+});
+
 router.get('/:id/factura', (req, res) => {
-    ventaService.obtenerFacturaPorVenta(req.params.id, (error, factura) => {
+    ventaService.obtenerFacturaPorVenta(req.params.id, req.query.cliente_id, (error, factura) => {
         if (error) {
             return res.status(500).json({ mensaje: 'Error al consultar factura' });
+        }
+        if (!factura) {
+            return res.status(404).json({ mensaje: 'Factura no encontrada o no pertenece al usuario' });
         }
         res.json(factura);
     });
