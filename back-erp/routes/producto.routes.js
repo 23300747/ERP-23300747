@@ -3,6 +3,7 @@ const router = express.Router();
 const productoService = require('../services/producto.service');
 const { exigirSesion, soloPara } = require('../middleware/auth');
 
+// Consulta el catálogo público de productos.
 router.get('/', (req, res) => {
     productoService.obtenerProductos((error, productos) => {
         if (error) {
@@ -25,6 +26,7 @@ function validarNumero(num) {
     return null;
 }
 
+// Crea un producto; solo el administrador puede modificar el catálogo.
 router.post('/', exigirSesion, soloPara('administrador'), (req, res) => {
     const { nombre, categoria, precio } = req.body;
     const errNombre = validarTexto(nombre, 50);
@@ -44,6 +46,7 @@ router.post('/', exigirSesion, soloPara('administrador'), (req, res) => {
     });
 });
 
+// Actualiza los datos de un producto existente.
 router.put('/:id', exigirSesion, soloPara('administrador'), (req, res) => {
     productoService.editarProducto(req.params.id, req.body, (error, producto) => {
         if (error) {
@@ -53,6 +56,7 @@ router.put('/:id', exigirSesion, soloPara('administrador'), (req, res) => {
     });
 });
 
+// Elimina un producto del catálogo.
 router.delete('/:id', exigirSesion, soloPara('administrador'), (req, res) => {
     productoService.eliminarProducto(req.params.id, (error, resultado) => {
         if (error) {

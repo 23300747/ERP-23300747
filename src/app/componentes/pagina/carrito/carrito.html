@@ -50,17 +50,18 @@
                   </div>
                 </td>
                 <td>
-                  <strong class="nombre-prod-tabla">{{ prod.nombre || prod.producto }}</strong>
+                  <strong class="nombre-prod-tabla">{{ prod.nombre }}</strong>
                 </td>
                 <td>{{ prod.categoria || 'Cafetería' }}</td>
                 <td><strong>${{ formatoMoneda(prod.precio) }}</strong> <small>MXN</small></td>
                 <td>
-                  <span class="stock-badge" [ngClass]="{
-                    'verde': prod.cantidad > 5,
-                    'naranja': prod.cantidad > 0 && prod.cantidad <= 5,
-                    'roja': prod.cantidad <= 0
-                  }">
-                    {{ prod.cantidad > 5 ? 'Disponible (' + prod.cantidad + ')' : (prod.cantidad > 0 ? 'Poco stock (' + prod.cantidad + ')' : 'Agotado') }}
+                  <span
+                    class="stock-badge"
+                    [class.verde]="prod.cantidad >= 10"
+                    [class.naranja]="prod.cantidad > 0 && prod.cantidad < 10"
+                    [class.roja]="prod.cantidad <= 0"
+                  >
+                    {{ prod.cantidad >= 10 ? 'Disponible (' + prod.cantidad + ')' : (prod.cantidad > 0 ? 'Poco stock (' + prod.cantidad + ')' : 'Agotado') }}
                   </span>
                 </td>
                 <td>

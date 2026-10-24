@@ -16,23 +16,16 @@ function obtenerProductos(callback) {
             return {
                 id: p.id,
                 nombre: p.nombre,
-                producto: p.nombre,
                 categoria: p.categoria,
                 cantidad: p.cantidad,
                 precio: precioNum,
-                precioUnitario: precioNum,
                 imagen: p.imagen || '',
                 estado,
-                claseEstado: clase,
-                claseEtiqueta: clase
+                claseEstado: clase
             };
         });
         callback(null, productos);
     });
-}
-
-function obtenerProductosParaCompra(callback) {
-    obtenerProductos(callback);
 }
 
 function agregarProducto(datos, callback) {
@@ -68,7 +61,6 @@ function eliminarProducto(id, callback) {
 
 module.exports = {
     obtenerProductos,
-    obtenerProductosParaCompra,
     agregarProducto,
     editarProducto,
     eliminarProducto

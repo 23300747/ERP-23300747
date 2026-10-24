@@ -25,7 +25,7 @@ async function enviarRecibo({ cliente, venta, factura, captureId }) {
         );
     }
 
-    lineas.push('', 'Adjuntamos tu comprobante fiscal escolar en formato XML.');
+    lineas.push('', 'Adjuntamos tu comprobante fiscal en formato XML.');
 
     const destino = process.env.MAIL_DESTINO || (cliente?.correo ? cliente.correo.trim() : '');
 

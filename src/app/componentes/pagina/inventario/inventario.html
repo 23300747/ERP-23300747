@@ -27,15 +27,15 @@
             <tr>
               <td style="width: 60px;">
                 @if (item.imagen) {
-                  <img [src]="item.imagen" [alt]="item.producto" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #d7ccc8;" />
+                  <img [src]="item.imagen" [alt]="item.nombre" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; border: 1px solid #d7ccc8;" />
                 } @else {
                   <span style="font-size: 11px; color: #999;">Sin foto</span>
                 }
               </td>
-              <td><strong>{{ item.producto }}</strong></td>
+              <td><strong>{{ item.nombre }}</strong></td>
               <td>{{ item.categoria }}</td>
               <td>{{ item.cantidad }}</td>
-              <td>${{ item.precioUnitario }}</td>
+              <td>${{ item.precio }}</td>
               <td>
                 <span class="etiqueta {{ item.claseEstado }}">{{ item.estado }}</span>
               </td>

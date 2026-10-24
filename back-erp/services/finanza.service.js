@@ -65,15 +65,27 @@ function obtenerReportes(callback) {
                 nombre: r.descripcion || r.tipo_movimiento,
                 periodo: new Date(r.fecha).toLocaleDateString(),
                 fecha: new Date(r.fecha).toLocaleDateString(),
-                formato: 'XLSX'
+                formato: 'CSV'
             }));
             callback(null, reportes);
         }
     );
 }
 
+// Registra un movimiento financiero manual.
+function registrarMovimiento(movimiento, callback) {
+    const { tipo_movimiento, monto, descripcion } = movimiento;
+    db.query(
+        `INSERT INTO movimiento_financiero (tipo_movimiento, monto, fecha, descripcion)
+         VALUES (?, ?, NOW(), ?)`,
+        [tipo_movimiento, monto, descripcion],
+        callback
+    );
+}
+
 module.exports = {
     obtenerResumen,
     obtenerGraficaSemanal,
-    obtenerReportes
+    obtenerReportes,
+    registrarMovimiento
 };

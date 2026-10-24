@@ -15,6 +15,12 @@ export interface DiaCalendario {
   activo: boolean;
 }
 
+function fechaLocalISO(): string {
+  const ahora = new Date();
+  const offset = ahora.getTimezoneOffset() * 60000;
+  return new Date(ahora.getTime() - offset).toISOString().split('T')[0];
+}
+
 @Component({
   imports: [],
   selector: 'app-rh',
@@ -35,7 +41,7 @@ export class Rh implements OnInit {
   // Asistencia de empleados
   mostrarModalAsistencia = false;
   empleadoSeleccionado: Empleado | null = null;
-  formAsistenciaFecha = new Date().toISOString().split('T')[0];
+  formAsistenciaFecha = fechaLocalISO();
   formAsistenciaHoraEntrada = '08:00';
   formAsistenciaHoraSalida = '16:00';
   formAsistenciaEstado = 'Presente';
@@ -137,7 +143,7 @@ export class Rh implements OnInit {
   // Encargado de abrir y registrar asistencia del empleado
   abrirModalAsistencia(emp: Empleado): void {
     this.empleadoSeleccionado = emp;
-    this.formAsistenciaFecha = new Date().toISOString().split('T')[0];
+    this.formAsistenciaFecha = fechaLocalISO();
     this.formAsistenciaHoraEntrada = '08:00';
     this.formAsistenciaHoraSalida = '16:00';
     this.formAsistenciaEstado = 'Presente';

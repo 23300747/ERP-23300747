@@ -10,10 +10,10 @@ interface Distribuidor {
 
 export interface ProductoInventario {
   id: number;
-  producto: string;
+  nombre: string;
   categoria: string;
   cantidad: string;
-  precioUnitario: string;
+  precio: string;
   imagen?: string;
   estado: string;
   claseEstado: string;
@@ -100,9 +100,9 @@ export class Inventario implements OnInit {
 
   editarProducto(producto: ProductoInventario): void {
     this.productoEditandoId = producto.id;
-    this.formNombre = producto.producto;
+    this.formNombre = producto.nombre;
     this.formCategoria = producto.categoria;
-    this.formPrecio = producto.precioUnitario;
+    this.formPrecio = producto.precio;
     this.formCantidad = producto.cantidad;
     this.formImagen = producto.imagen || '';
     this.errorMensaje = '';
@@ -112,7 +112,7 @@ export class Inventario implements OnInit {
   }
 
   eliminarProducto(producto: ProductoInventario): void {
-    if (!window.confirm(`¿Eliminar "${producto.producto}" del inventario?`)) {
+    if (!window.confirm(`¿Eliminar "${producto.nombre}" del inventario?`)) {
       return;
     }
 

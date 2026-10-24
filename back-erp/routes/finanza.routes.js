@@ -32,10 +32,8 @@ router.get('/reportes', (req, res) => {
     });
 });
 
-const finanzasService = require('../services/finanzas.service');
-
 router.post('/movimiento', (req, res) => {
-    finanzasService.registrarMovimiento(req.body, (error, resultado) => {
+    finanzaService.registrarMovimiento(req.body, (error, resultado) => {
         if (error) {
             return res.status(500).json({ mensaje: 'Error al registrar movimiento' });
         }

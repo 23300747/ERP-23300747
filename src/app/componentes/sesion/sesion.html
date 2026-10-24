@@ -26,7 +26,7 @@
 
       <form class="auth-formulario" (submit)="$event.preventDefault(); enviar()">
         <div class="auth-grupo">
-          <label>{{ !mostrarRegistro ? 'Correo institucional' : 'Correo electrónico' }}</label>
+          <label>Correo electrónico</label>
           <input type="email" name="correo" [value]="correo" (input)="correo = $any($event.target).value" [placeholder]="!mostrarRegistro ? 'ejemplo@correo.com' : 'usuario@dominio.com'">
         </div>
 

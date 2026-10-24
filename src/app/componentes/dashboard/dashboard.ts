@@ -1,5 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, effect } from '@angular/core';
 import { DashboardService } from '../../servicios/dashboard.service';
+import { ReporteService } from '../../servicios/reporte.service';
 
 export interface TarjetaDashboard {
   id: string;
@@ -48,8 +49,17 @@ export class Dashboard implements OnInit {
 
   constructor(
     private dashboardService: DashboardService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private reporteService: ReporteService
+  ) {
+    effect(() => {
+      const tarjeta = this.tarjetas.find(t => t.id === 'finanzas');
+      if (tarjeta) {
+        tarjeta.metrica2.valor = String(this.reporteService.generados());
+      }
+      this.cdr.detectChanges();
+    });
+  }
 
   // Encargado de cargar el resumen general al iniciar
   ngOnInit(): void {
@@ -58,7 +68,7 @@ export class Dashboard implements OnInit {
         console.error('Error al obtener resumen del dashboard:', error);
         return;
       }
-      this.actualizarTarjeta('finanzas', data.finanzas.ingresosMes, String(data.finanzas.reportes));
+      this.actualizarTarjeta('finanzas', data.finanzas.ingresosMes, String(this.reporteService.generados()));
       this.actualizarTarjeta('inventario', String(data.inventario.productos), String(data.inventario.stockBajo));
       this.actualizarTarjeta('ventas', String(data.ventas.ventasHoy), data.ventas.totalDia);
       this.actualizarTarjeta('rh', String(data.rh.empleados), String(data.rh.turnosHoy));

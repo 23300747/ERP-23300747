@@ -5,7 +5,7 @@ const ventaService = require('../services/venta.service');
 const correoService = require('../services/correo.service');
 const { exigirSesion, soloPara } = require('../middleware/auth');
 
-// Crear orden PayPal (soporta formato del maestro /orden y formato existente /crear-orden)
+// Crea una orden PayPal con los productos y datos del cliente.
 const manejarCrearOrden = (req, res) => {
     // Normalizar datos de entrada
     const productos = req.body.productos || req.body.items || [];
@@ -59,9 +59,8 @@ const manejarCrearOrden = (req, res) => {
 };
 
 router.post('/orden', exigirSesion, soloPara('administrador', 'cliente'), manejarCrearOrden);
-router.post('/crear-orden', exigirSesion, soloPara('administrador', 'cliente'), manejarCrearOrden);
 
-// Capturar orden PayPal (soporta /capturar/:orderId y /capturar-orden)
+// Captura una orden PayPal aprobada y registra la venta.
 const manejarCapturarOrden = (req, res) => {
     const orderID = req.params.orderId || req.body.orderID || req.body.orderId;
     const datosVenta = req.body.datosVenta || req.body;
@@ -95,7 +94,7 @@ const manejarCapturarOrden = (req, res) => {
 
         // Pago Aprobado: registrar la venta y generar factura XML
         const ventaPayload = {
-            cliente_id: datosVenta?.cliente_id || null,
+            cliente_id: req.usuario?.rol === 'cliente' ? req.usuario.id : null,
             nombre_cliente: datosVenta?.nombre_cliente || datosVenta?.nombreReceptor || 'Cliente',
             rfc_cliente: datosVenta?.rfc_cliente || datosVenta?.rfcReceptor || 'XAXX010101000',
             telefono_cliente: datosVenta?.telefono_cliente || '',
@@ -149,6 +148,5 @@ const manejarCapturarOrden = (req, res) => {
 };
 
 router.post('/capturar/:orderId', exigirSesion, soloPara('administrador', 'cliente'), manejarCapturarOrden);
-router.post('/capturar-orden', exigirSesion, soloPara('administrador', 'cliente'), manejarCapturarOrden);
 
 module.exports = router;

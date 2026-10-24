@@ -58,7 +58,7 @@ export class CarritoService {
       return { ok: false, mensaje: 'La cantidad debe ser mayor a 0' };
     }
 
-    const maxDisponible = Number(producto.cantidad ?? producto.disponible ?? 9999);
+    const maxDisponible = Number(producto.cantidad ?? 9999);
     const actuales = [...this.items()];
     const index = actuales.findIndex(it => it.id === producto.id);
 
@@ -75,7 +75,7 @@ export class CarritoService {
       }
       actuales.push({
         id: producto.id,
-        nombre: producto.nombre || producto.producto,
+        nombre: producto.nombre,
         categoria: producto.categoria || 'General',
         precio: Number(producto.precio),
         cantidad: cant,

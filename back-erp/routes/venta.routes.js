@@ -24,21 +24,16 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    ventaService.crearVenta(req.body, (error, venta) => {
+    const datosVenta = {
+        ...req.body,
+        cliente_id: req.usuario.rol === 'cliente' ? req.usuario.id : null
+    };
+
+    ventaService.crearVenta(datosVenta, (error, venta) => {
         if (error) {
             return res.status(400).json({ mensaje: error.message || 'Error al registrar venta' });
         }
         res.status(201).json(venta);
-    });
-});
-
-router.post('/validar-orden', (req, res) => {
-    const { items } = req.body;
-    ventaService.validarStockOrden(items, (error, calculo) => {
-        if (error) {
-            return res.status(400).json({ mensaje: error.message });
-        }
-        res.json(calculo);
     });
 });
 

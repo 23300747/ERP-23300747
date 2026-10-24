@@ -53,7 +53,7 @@ function generarFacturaXML(datos) {
         const precioUnit = Number(item.precio_unitario || 0);
         const importeItem = (cant * precioUnit).toFixed(2);
         const ivaItem = (cant * precioUnit * 0.16).toFixed(2);
-        const descripcion = escaparXML(item.nombre || item.producto || `Producto #${item.producto_id}`);
+        const descripcion = escaparXML(item.nombre || `Producto #${item.producto_id}`);
 
         conceptosXML += `
     <cfdi:Concepto ClaveProdServ="50201700" Cantidad="${cant}" ClaveUnidad="H87" Unidad="Pieza" Descripcion="${descripcion}" ValorUnitario="${precioUnit.toFixed(2)}" Importe="${importeItem}">

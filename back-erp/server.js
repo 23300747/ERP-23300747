@@ -18,7 +18,6 @@ app.use('/api/finanzas', require('./routes/finanza.routes'));
 app.use('/api/dashboard', require('./routes/dashboard.routes'));
 app.use('/api/sesion', require('./routes/sesion.routes'));
 app.use('/api/paypal', require('./routes/paypal.routes'));
-app.use('/api/ordenes', require('./routes/orden.routes'));
 app.use(manejarErrores);
 
 app.listen(3000, () => {

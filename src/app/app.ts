@@ -3,10 +3,10 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } fro
 import { filter } from 'rxjs/operators';
 import { AuthService } from './servicios/auth.service';
 import { LegalService } from './servicios/legal.service';
+import { CarritoService } from './servicios/carrito.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -18,6 +18,7 @@ export class App {
   private router = inject(Router);
   private authService = inject(AuthService);
   public legalService = inject(LegalService);
+  private carritoService = inject(CarritoService);
 
   constructor() {
     this.router.events.pipe(
@@ -42,6 +43,7 @@ export class App {
   }
 
   cerrarSesion(): void {
+    this.carritoService.vaciar();
     this.authService.cerrarSesion();
     this.mostrarLayout.set(false);
   }

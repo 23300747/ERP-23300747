@@ -125,21 +125,31 @@ function crearVenta(datos, callback) {
         db.beginTransaction((errTx) => {
             if (errTx) return callback(errTx, null);
 
-            // 1. Descuenta stock del producto
-            for (const item of itemsVerificados) {
+            // 1. Descuenta stock y espera cada consulta antes de continuar.
+            function actualizarStock(indice) {
+                if (indice >= itemsVerificados.length) {
+                    return registrarMovimiento();
+                }
+
+                const item = itemsVerificados[indice];
                 db.query(
                     'UPDATE producto SET cantidad = cantidad - ?, fecha_modificacion = NOW() WHERE id = ?',
-                    [item.cantidad, item.producto_id]
+                    [item.cantidad, item.producto_id],
+                    (errStock) => {
+                        if (errStock) return db.rollback(() => callback(errStock, null));
+                        actualizarStock(indice + 1);
+                    }
                 );
             }
 
             // 2. Registra movimiento financiero (ingreso)
-            db.query(
-                `INSERT INTO movimiento_financiero (tipo_movimiento, monto, fecha, descripcion, referencia_paypal)
-                 VALUES ('ingreso', ?, NOW(), ?, ?)`,
-                [total, `Venta PayPal (${orden_paypal_id}) - ${nombre_cliente}`, orden_paypal_id],
-                (errMov) => {
-                    if (errMov) return db.rollback(() => callback(errMov, null));
+            function registrarMovimiento() {
+                db.query(
+                    `INSERT INTO movimiento_financiero (tipo_movimiento, monto, fecha, descripcion, referencia_paypal)
+                     VALUES ('ingreso', ?, NOW(), ?, ?)`,
+                    [total, `Venta PayPal (${orden_paypal_id}) - ${nombre_cliente}`, orden_paypal_id],
+                    (errMov) => {
+                        if (errMov) return db.rollback(() => callback(errMov, null));
 
                     // 3. Genera Factura Electronica XML CFDI 4.0
                     const facturaXML = generarFacturaXML({
@@ -174,8 +184,11 @@ function crearVenta(datos, callback) {
                             });
                         }
                     );
-                }
-            );
+                    }
+                );
+            }
+
+            actualizarStock(0);
         });
     });
 }

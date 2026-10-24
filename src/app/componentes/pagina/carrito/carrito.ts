@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { CarritoService } from '../../../servicios/carrito.service';
 import { ProductoService } from '../../../servicios/producto.service';
 import { AuthService } from '../../../servicios/auth.service';
@@ -12,8 +11,6 @@ const RFC_REGEX = /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/;
 
 @Component({
   selector: 'app-carrito',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './carrito.html',
   styleUrl: './carrito.css'
 })
@@ -86,9 +83,8 @@ export class Carrito implements OnInit {
       if (!error && Array.isArray(datos)) {
         this.productos = datos.map(p => ({
           ...p,
-          nombre: p.nombre || p.producto,
-          precio: Number(p.precio ?? p.costoVenta ?? p.precioUnitario ?? 0),
-          cantidad: Number(p.cantidad ?? p.stock ?? 0)
+          precio: Number(p.precio ?? 0),
+          cantidad: Number(p.cantidad ?? 0)
         }));
         for (const p of this.productos) {
           if (!this.cantidades[p.id]) {
@@ -109,7 +105,7 @@ export class Carrito implements OnInit {
     const texto = this.filtroTexto.toLowerCase().trim();
     if (!texto) return this.productos;
     return this.productos.filter(p =>
-      (p.nombre || p.producto || '').toLowerCase().includes(texto) ||
+      (p.nombre || '').toLowerCase().includes(texto) ||
       (p.categoria || '').toLowerCase().includes(texto)
     );
   }

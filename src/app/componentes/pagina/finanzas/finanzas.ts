@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FinanzaService } from '../../../servicios/finanza.service';
+import { ReporteService } from '../../../servicios/reporte.service';
 import { validarTexto, validarNumero } from '../../../servicios/http-cliente';
 
 export interface ResumenFinanzas {
@@ -47,6 +48,7 @@ export class Finanzas implements OnInit {
 
   constructor(
     private finanzaService: FinanzaService,
+    private reporteService: ReporteService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -151,5 +153,6 @@ export class Finanzas implements OnInit {
     document.body.appendChild(enlace);
     enlace.click();
     document.body.removeChild(enlace);
+    this.reporteService.registrarGeneracion();
   }
 }

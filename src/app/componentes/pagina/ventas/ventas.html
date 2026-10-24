@@ -43,8 +43,8 @@
           <tr>
             <th>Folio</th>
             <th>Cliente</th>
-            <th>Canal</th>
-            <th>Total</th>
+            <th>Referencia de pago</th>
+            <th>Subtotal</th>
             <th>IVA</th>
             <th>Estado & Factura XML</th>
           </tr>
@@ -101,7 +101,7 @@
           <select [value]="formProductoId" (change)="formProductoId = $any($event.target).value">
             <option value="">Seleccione un producto...</option>
             @for (prod of productosLista; track prod.id) {
-              <option [value]="prod.id">{{ prod.producto || prod.nombre }} (Stock: {{ prod.cantidad }})</option>
+              <option [value]="prod.id">{{ prod.nombre }} (Stock: {{ prod.cantidad }})</option>
             }
           </select>
         </div>
@@ -128,7 +128,7 @@
     <div class="modal-overlay">
       <div class="modal-contenido" style="max-width: 680px;">
         <div class="modal-cabecera">
-          <h3>Comprobante Fiscal Digital (CFDI 4.0) - Venta #{{ facturaSeleccionada?.venta_id }}</h3>
+          <h3>Comprobante Fiscal Digital (CFDI 4.0) - Venta #{{ facturaSeleccionada?.id || facturaSeleccionada?.folio || facturaSeleccionada?.venta_id }}</h3>
           <button class="btn-cerrar-x" (click)="cerrarModalFactura()">✕</button>
         </div>
         <div style="padding: 16px 20px;">

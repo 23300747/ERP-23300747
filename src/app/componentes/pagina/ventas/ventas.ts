@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { VentaService } from '../../../servicios/venta.service';
 import { ProductoService } from '../../../servicios/producto.service';
 import { AuthService } from '../../../servicios/auth.service';
@@ -23,8 +22,6 @@ export interface Venta {
 
 @Component({
   selector: 'app-ventas',
-  standalone: true,
-  imports: [CommonModule],
   styleUrl: './ventas.css',
   templateUrl: './ventas.html',
 })
@@ -140,7 +137,11 @@ export class Ventas implements OnInit {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Factura-Folio-${this.facturaSeleccionada.venta_id || 'CFDI'}.xml`;
+    const folio = this.facturaSeleccionada.id
+      || this.facturaSeleccionada.folio
+      || this.facturaSeleccionada.venta_id
+      || 'CFDI';
+    a.download = `Factura-Folio-${folio}.xml`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
