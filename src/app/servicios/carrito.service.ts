@@ -1,3 +1,4 @@
+//manda la información del carrito al localStorage y la mantiene sincronizada con la señal de Angular
 import { Injectable, signal } from '@angular/core';
 
 export interface ItemCarrito {

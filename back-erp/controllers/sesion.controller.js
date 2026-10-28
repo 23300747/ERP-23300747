@@ -1,5 +1,5 @@
-const UsuarioModel = require('../models/usuario.model');
-const { emitirToken } = require('../middleware/auth');
+//validaciones de sesion
+const authService = require('../services/auth.service');
 
 // Validaciones
 function validarTexto(texto, campo, maxLen = 255) {
@@ -36,7 +36,7 @@ const SesionController = {
         const errPass = validarTexto(contrasena, 'Contraseña', 100);
         if (errPass) return res.status(400).json({ mensaje: errPass });
 
-        UsuarioModel.buscarPorCredenciales(correo.trim(), contrasena, (error, resultado) => {
+        authService.iniciarSesion(correo.trim(), contrasena, (error, resultado) => {
             if (error) {
                 console.error('Error en login:', error);
                 return res.status(500).json({ mensaje: 'Error al verificar credenciales' });
@@ -54,7 +54,7 @@ const SesionController = {
                     existe: true,
                     rol: resultado.rol,
                     usuario: resultado.usuario,
-                    token: emitirToken({ id: resultado.usuario.id, rol: resultado.rol }),
+                    token: authService.emitirToken({ id: resultado.usuario.id, rol: resultado.rol }),
                     mensaje: 'Inicio de sesión correcto'
                 });
             } catch (errorToken) {
@@ -75,7 +75,7 @@ const SesionController = {
         const errPass = validarTexto(contrasena, 'Contraseña', 100);
         if (errPass) return res.status(400).json({ mensaje: errPass });
 
-        UsuarioModel.buscarPorCorreo(correo.trim(), (errBuscar, yaExiste) => {
+        authService.correoRegistrado(correo.trim(), (errBuscar, yaExiste) => {
             if (errBuscar) {
                 return res.status(500).json({ mensaje: 'Error al validar disponibilidad del correo' });
             }
@@ -84,7 +84,7 @@ const SesionController = {
                 return res.status(409).json({ mensaje: 'El correo electrónico ya se encuentra registrado' });
             }
 
-            UsuarioModel.crearCliente({
+            authService.crearCuentaCliente({
                 correo: correo.trim(),
                 contrasena: contrasena.trim()
             }, (errCrear, nuevoCliente) => {

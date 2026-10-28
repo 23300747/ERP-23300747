@@ -1,4 +1,8 @@
-const db = require('../config/db');
+// Logica de mostrar dashboard: resumen de ingresos, egresos, productos, empleados, turnos, etc.
+const movimientoModel = require('../models/movimiento.model');
+const productoModel = require('../models/producto.model');
+const empleadoModel = require('../models/empleado.model');
+const asistenciaModel = require('../models/asistencia.model');
 
 // junta los numeros que se muestran en las tarjetas del dashboard.
 function obtenerResumenDashboard(callback) {
@@ -24,46 +28,37 @@ function obtenerResumenDashboard(callback) {
         }
     }
 
-    db.query(
-        `SELECT COALESCE(SUM(CASE WHEN tipo_movimiento = 'ingreso' THEN monto ELSE 0 END), 0) AS ingresosMes
-         FROM movimiento_financiero
-         WHERE MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())`,
-        (error, rows) => {
-            if (error) return terminarUno(error);
-            resultado.finanzas = rows[0];
-            terminarUno(null);
-        }
-    );
+    movimientoModel.sumarIngresosDelMes((error, rows) => {
+        if (error) return terminarUno(error);
+        resultado.finanzas = rows[0];
+        terminarUno(null);
+    });
 
-    db.query(
-        `SELECT COUNT(*) AS totalProductos, SUM(CASE WHEN cantidad < 10 THEN 1 ELSE 0 END) AS stockBajo FROM producto`,
-        (error, rows) => {
-            if (error) return terminarUno(error);
-            resultado.inventario = rows[0];
-            terminarUno(null);
-        }
-    );
+    productoModel.resumenInventario((error, rows) => {
+        if (error) return terminarUno(error);
+        resultado.inventario = rows[0];
+        terminarUno(null);
+    });
 
-    db.query(
-        `SELECT COUNT(*) AS ventasHoy, COALESCE(SUM(monto), 0) AS totalDia
-         FROM movimiento_financiero
-         WHERE tipo_movimiento = 'ingreso' AND DATE(fecha) = CURDATE()`,
-        (error, rows) => {
-            if (error) return terminarUno(error);
-            resultado.ventas = rows[0];
-            terminarUno(null);
-        }
-    );
+    movimientoModel.resumenIngresosDelDia((error, rows) => {
+        if (error) return terminarUno(error);
+        resultado.ventas = rows[0];
+        terminarUno(null);
+    });
 
-    db.query(
-        `SELECT (SELECT COUNT(*) FROM empleado) AS empleados,
-                (SELECT COUNT(*) FROM asistencia WHERE fecha = CURDATE()) AS turnosHoy`,
-        (error, rows) => {
-            if (error) return terminarUno(error);
-            resultado.rh = rows[0];
+    // RH: total de empleados y turnos (asistencias) registrados hoy
+    empleadoModel.contar((error, filasEmpleados) => {
+        if (error) return terminarUno(error);
+
+        asistenciaModel.contarDelDia((errorAsistencia, filasAsistencia) => {
+            if (errorAsistencia) return terminarUno(errorAsistencia);
+            resultado.rh = {
+                empleados: filasEmpleados[0].empleados,
+                turnosHoy: filasAsistencia[0].turnosHoy
+            };
             terminarUno(null);
-        }
-    );
+        });
+    });
 }
 
 module.exports = { obtenerResumenDashboard };

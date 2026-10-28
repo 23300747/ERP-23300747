@@ -1,4 +1,5 @@
-const db = require('../config/db');
+// Logica de crear, editar, eliminar y listar productos
+const productoModel = require('../models/producto.model');
 
 function calcularEstado(cantidad) {
     if (cantidad <= 0) return { estado: 'Agotado', clase: 'roja' };
@@ -7,7 +8,7 @@ function calcularEstado(cantidad) {
 }
 
 function obtenerProductos(callback) {
-    db.query('SELECT * FROM producto', (error, rows) => {
+    productoModel.listar((error, rows) => {
         if (error) return callback(error, null);
 
         const productos = rows.map(p => {
@@ -30,9 +31,8 @@ function obtenerProductos(callback) {
 
 function agregarProducto(datos, callback) {
     const { nombre, categoria, precio, cantidad, imagen = '' } = datos;
-    db.query(
-        'INSERT INTO producto (nombre, categoria, precio, cantidad, imagen, fecha_modificacion) VALUES (?, ?, ?, ?, ?, NOW())',
-        [nombre, categoria, Number(precio || 0), cantidad || 0, imagen],
+    productoModel.insertar(
+        { nombre, categoria, precio: Number(precio || 0), cantidad: cantidad || 0, imagen },
         (error, resultado) => {
             if (error) return callback(error, null);
             callback(null, { id: resultado.insertId, ...datos });
@@ -42,9 +42,9 @@ function agregarProducto(datos, callback) {
 
 function editarProducto(id, datos, callback) {
     const { nombre, categoria, precio, cantidad, imagen } = datos;
-    db.query(
-        'UPDATE producto SET nombre = ?, categoria = ?, precio = ?, cantidad = ?, imagen = COALESCE(?, imagen), fecha_modificacion = NOW() WHERE id = ?',
-        [nombre, categoria, Number(precio || 0), cantidad, imagen, id],
+    productoModel.actualizar(
+        id,
+        { nombre, categoria, precio: Number(precio || 0), cantidad, imagen },
         (error) => {
             if (error) return callback(error, null);
             callback(null, { id, ...datos });
@@ -53,7 +53,7 @@ function editarProducto(id, datos, callback) {
 }
 
 function eliminarProducto(id, callback) {
-    db.query('DELETE FROM producto WHERE id = ?', [id], (error) => {
+    productoModel.eliminar(id, (error) => {
         if (error) return callback(error, null);
         callback(null, { mensaje: 'Producto eliminado' });
     });

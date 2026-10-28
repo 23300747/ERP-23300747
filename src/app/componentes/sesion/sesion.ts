@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../servicios/auth.service';
 import { validarCorreo, validarTexto } from '../../servicios/http-cliente';
+import { LegalService } from '../../servicios/legal.service';
 
 @Component({
   imports: [],
@@ -16,16 +17,19 @@ export class Sesion {
 
   correo = '';
   contrasena = '';
+  aceptoTerminos = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
+    public legalService: LegalService,
     private cdr: ChangeDetectorRef
   ) {}
 
   alternarVista(): void {
     this.mostrarRegistro = !this.mostrarRegistro;
     this.mensajeError = '';
+    this.aceptoTerminos = false;
     this.cdr.detectChanges();
   }
 
@@ -46,6 +50,11 @@ export class Sesion {
     }
 
     if (this.mostrarRegistro) {
+      if (!this.aceptoTerminos) {
+        this.mensajeError = 'Debes aceptar los Términos y Condiciones para crear una cuenta';
+        return;
+      }
+
       this.cargando = true;
       this.authService.registrarCliente(
         { correo: this.correo, contrasena: this.contrasena },

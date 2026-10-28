@@ -132,8 +132,8 @@ export class Finanzas implements OnInit {
     });
   }
 
-  // Encargado de exportar reportes financieros a un archivo CSV/Excel
-  exportarExcel(): void {
+  // Encargado de exportar reportes financieros a un archivo CSV
+  exportarCsv(): void {
     let contenidoCsv = '\ufeffReporte,Periodo,Fecha,Formato\n';
     if (this.reportes && this.reportes.length > 0) {
       for (const rep of this.reportes) {

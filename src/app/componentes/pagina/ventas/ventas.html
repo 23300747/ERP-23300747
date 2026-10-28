@@ -55,7 +55,7 @@
               <td><strong>#{{ item.folio }}</strong></td>
               <td>{{ item.cliente }}</td>
               <td>{{ item.canal }}</td>
-              <td><strong>{{ item.total }}</strong></td>
+              <td><strong>{{ item.subtotal }}</strong></td>
               <td>{{ item.iva }}</td>
               <td>
                 <span class="etiqueta {{ item.claseEstado }}">{{ item.estadoFactura }}</span>
@@ -94,7 +94,7 @@
 
         <div class="form-grupo">
           <label>Nombre del Cliente: *</label>
-          <input type="text" [value]="formNombreCliente" (input)="formNombreCliente = $any($event.target).value" placeholder="Público general" />
+          <input type="text" [value]="formNombreCliente" (input)="formNombreCliente = $any($event.target).value" placeholder="Nombre del cliente" />
         </div>
         <div class="form-grupo">
           <label>Producto: *</label>
@@ -123,7 +123,7 @@
     </div>
   }
 
-  <!-- MODAL DE VISUALIZACIÓN Y DESCARGA DE FACTURA XML (CFDI 4.0) -->
+  <!--  DESCARGA DE FACTURA XML de forma automática visual -->
   @if (mostrarModalFactura) {
     <div class="modal-overlay">
       <div class="modal-contenido" style="max-width: 680px;">

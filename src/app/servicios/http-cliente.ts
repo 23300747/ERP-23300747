@@ -1,3 +1,4 @@
+//manda peticiones HTTP al backend y devuelve la respuesta a los servicios que la soliciten
 export type CallbackHttp = (error: any, datos: any) => void;
 
 function peticion(metodo: string, url: string, datos: any, callback: CallbackHttp): void {

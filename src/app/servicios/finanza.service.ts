@@ -1,3 +1,4 @@
+//recibe la información de finanzas desde el backend y la devuelve a los componentes que la soliciten
 import { Injectable } from '@angular/core';
 import { CallbackHttp, obtenerJSON, postJSON } from './http-cliente';
 

@@ -1,3 +1,4 @@
+//manda y recibe la información de los productos al localStorage
 import { Injectable } from '@angular/core';
 import { CallbackHttp, obtenerJSON, postJSON, putJSON, eliminarJSON } from './http-cliente';
 

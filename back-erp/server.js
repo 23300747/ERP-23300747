@@ -1,3 +1,4 @@
+//Carga el .env, activa cors y JSON (límite 10mb), monta las 8 rutas bajo /api/..., conecta el manejador de errores y arranca el servidor en el puerto 3000
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 

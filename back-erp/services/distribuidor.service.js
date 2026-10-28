@@ -1,7 +1,8 @@
-const db = require('../config/db');
+// logica de crear, editar, eliminar y listar distribuidores
+const distribuidorModel = require('../models/distribuidor.model');
 
 function obtenerDistribuidores(callback) {
-    db.query('SELECT id, nombre FROM distribuidor ORDER BY nombre', callback);
+    distribuidorModel.listar(callback);
 }
 
 function validarNombre(nombre) {
@@ -26,7 +27,7 @@ function agregarDistribuidor(datos, callback) {
     }
 
     const nombre = datos.nombre.trim();
-    db.query('INSERT INTO distribuidor (nombre) VALUES (?)', [nombre], (error, resultado) => {
+    distribuidorModel.insertar(nombre, (error, resultado) => {
         if (error) return callback(error, null);
         callback(null, { id: resultado.insertId, nombre });
     });
@@ -40,14 +41,14 @@ function editarDistribuidor(id, datos, callback) {
     }
 
     const nombre = datos.nombre.trim();
-    db.query('UPDATE distribuidor SET nombre = ? WHERE id = ?', [nombre, id], (error) => {
+    distribuidorModel.actualizar(id, nombre, (error) => {
         if (error) return callback(error, null);
         callback(null, { id: Number(id), nombre });
     });
 }
 
 function eliminarDistribuidor(id, callback) {
-    db.query('DELETE FROM distribuidor WHERE id = ?', [id], (error) => {
+    distribuidorModel.eliminar(id, (error) => {
         if (error) return callback(error, null);
         callback(null, { mensaje: 'Distribuidor eliminado' });
     });

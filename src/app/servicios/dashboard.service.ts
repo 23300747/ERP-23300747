@@ -1,3 +1,4 @@
+//recibe la información del dashboard al localStorage
 import { Injectable } from '@angular/core';
 import { CallbackHttp, obtenerJSON } from './http-cliente';
 

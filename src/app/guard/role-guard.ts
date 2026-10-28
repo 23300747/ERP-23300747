@@ -1,3 +1,4 @@
+//evita que un usuario no autenticado acceda a rutas protegidas
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { AuthService } from '../servicios/auth.service';
@@ -17,7 +18,7 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     return true;
   }
 
-  // Si está autenticado pero no tiene permisos para la sección (ej. cliente intentando entrar a admin)
+  // Si está autenticado pero no tiene permisos para la sección
   return router.createUrlTree(['/compras']);
 };
 

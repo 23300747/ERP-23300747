@@ -1,3 +1,4 @@
+//revisa si el usuario tiene una sesión activa y si tiene permisos para acceder a la sección
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../servicios/auth.service';

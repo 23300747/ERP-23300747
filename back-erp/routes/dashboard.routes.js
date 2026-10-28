@@ -1,17 +1,11 @@
+//conexiones a a controladores y middleware para el dashboard
 const express = require('express');
 const router = express.Router();
-const dashboardService = require('../services/dashboard.service');
+const dashboardController = require('../controllers/dashboard.controller');
 const { exigirSesion, soloPara } = require('../middleware/auth');
 
 router.use(exigirSesion, soloPara('administrador'));
 
-router.get('/', (req, res) => {
-    dashboardService.obtenerResumenDashboard((error, resumen) => {
-        if (error) {
-            return res.status(500).json({ mensaje: 'Error al consultar dashboard' });
-        }
-        res.json(resumen);
-    });
-});
+router.get('/', dashboardController.consultarResumen);
 
 module.exports = router;

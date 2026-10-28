@@ -1,3 +1,4 @@
+// Servicio para interactuar con la API de PayPal Sandbox
 const PAYPAL_API_URL = process.env.PAYPAL_API_URL || 'https://api-m.sandbox.paypal.com';
 
 function obtenerCredenciales() {

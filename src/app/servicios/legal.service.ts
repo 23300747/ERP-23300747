@@ -1,3 +1,4 @@
+// hace que se pueda abrir y cerrar los documentos legales de la aplicación (términos y condiciones y política de privacidad)
 import { Injectable, signal } from '@angular/core';
 
 export type TipoDocumentoLegal = 'terminos' | 'privacidad' | null;

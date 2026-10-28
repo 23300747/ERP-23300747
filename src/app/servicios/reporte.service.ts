@@ -1,3 +1,4 @@
+// cuenta los reportes generados durante la sesion.
 import { Injectable, signal } from '@angular/core';
 
 @Injectable({

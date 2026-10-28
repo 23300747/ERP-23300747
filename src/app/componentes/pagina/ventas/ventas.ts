@@ -14,6 +14,7 @@ export interface Venta {
   folio: string;
   cliente: string;
   canal: string;
+  subtotal: string;
   total: string;
   iva: string;
   estadoFactura: string;
@@ -44,7 +45,7 @@ export class Ventas implements OnInit {
   cargando = false;
   errorMensaje = '';
 
-  formNombreCliente = 'Público general';
+  formNombreCliente = '';
   formProductoId: string = '';
   formCantidad: string = '';
   formPrecioUnitario: string = '';
@@ -90,7 +91,7 @@ export class Ventas implements OnInit {
   }
 
   abrirModal(): void {
-    this.formNombreCliente = 'Público general';
+    this.formNombreCliente = '';
     this.formProductoId = '';
     this.formCantidad = '';
     this.formPrecioUnitario = '';

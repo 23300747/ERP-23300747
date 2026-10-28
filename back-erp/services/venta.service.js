@@ -1,57 +1,57 @@
+// Logica de ventas: crear venta, validar stock, generar factura, obtener resumen de ventas
 const db = require('../config/db');
 const { generarFacturaXML } = require('./xml.service');
+const productoModel = require('../models/producto.model');
+const movimientoModel = require('../models/movimiento.model');
+const facturaModel = require('../models/factura.model');
+
+function nombreDesdeXml(archivoXml) {
+    const coincidencia = String(archivoXml || '').match(
+        /<cfdi:Receptor\b[^>]*\bNombre="([^"]*)"/
+    );
+    if (!coincidencia) return '';
+
+    return coincidencia[1]
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .trim();
+}
 
 // Resumen de ventas para el dashboard y panel
 function obtenerResumenVentas(callback) {
-    db.query(
-        `SELECT COUNT(*) AS ventasHoy,
-                COALESCE(SUM(monto), 0) AS totalDia,
-                COALESCE(SUM(ROUND(monto * 0.16 / 1.16, 2)), 0) AS ivaAcumulado
-         FROM movimiento_financiero
-         WHERE tipo_movimiento = 'ingreso' AND DATE(fecha) = CURDATE()`,
-        (error, rows) => {
-            if (error) return callback(error, null);
-            callback(null, rows[0] || { ventasHoy: 0, totalDia: 0, ivaAcumulado: 0 });
-        }
-    );
+    movimientoModel.resumenIngresosDelDiaConIva((error, rows) => {
+        if (error) return callback(error, null);
+        callback(null, rows[0] || { ventasHoy: 0, totalDia: 0, ivaAcumulado: 0 });
+    });
 }
 
 // Consulta de ventas / facturas generadas por PayPal
 function obtenerVentas(clienteId, callback) {
-    let sql = `SELECT f.id AS folio,
-                      COALESCE(c.correo, 'Público general') AS cliente,
-                      COALESCE(f.orden_paypal_id, 'PayPal') AS canal,
-                      f.fecha_emision,
-                      f.archivo_xml,
-                      'Facturada' AS estadoFactura
-               FROM factura f
-               LEFT JOIN cliente c ON c.id = f.cliente_id`;
-
-    const parametros = [];
-    if (clienteId) {
-        sql += ' WHERE f.cliente_id = ?';
-        parametros.push(clienteId);
-    }
-    sql += ' ORDER BY f.fecha_emision DESC';
-
-    db.query(sql, parametros, (error, rows) => {
+    facturaModel.listarConCliente(clienteId, (error, rows) => {
         if (error) return callback(error, null);
 
         const ventas = rows.map(f => {
             // Extrae montos del XML o defaults si existen
             let total = '$0.00';
+            let subtotal = '$0.00';
             let iva = '$0.00';
             if (f.archivo_xml) {
                 const totalMatch = f.archivo_xml.match(/Total="([^"]+)"/);
+                const subMatch = f.archivo_xml.match(/SubTotal="([^"]+)"/);
                 const ivaMatch = f.archivo_xml.match(/TotalImpuestosTrasladados="([^"]+)"/);
                 if (totalMatch) total = `$${Number(totalMatch[1]).toFixed(2)}`;
+                if (subMatch) subtotal = `$${Number(subMatch[1]).toFixed(2)}`;
                 if (ivaMatch) iva = `$${Number(ivaMatch[1]).toFixed(2)}`;
             }
 
             return {
                 folio: f.folio,
-                cliente: f.cliente,
+                cliente: nombreDesdeXml(f.archivo_xml) || f.cliente,
                 canal: f.canal,
+                subtotal,
                 total,
                 iva,
                 estadoFactura: f.estadoFactura,
@@ -74,7 +74,7 @@ function validarStockOrden(items, callback) {
         return callback(new Error('Productos invalidos en la orden'));
     }
 
-    db.query('SELECT id, nombre, precio, cantidad FROM producto WHERE id IN (?)', [ids], (error, productos) => {
+    productoModel.buscarPorIds(ids, (error, productos) => {
         if (error) return callback(error);
 
         const map = new Map(productos.map(p => [p.id, p]));
@@ -111,11 +111,16 @@ function validarStockOrden(items, callback) {
 function crearVenta(datos, callback) {
     const {
         cliente_id,
-        nombre_cliente = 'Cliente',
+        nombre_cliente = '',
         correo_cliente = '',
         orden_paypal_id = 'PAYPAL-' + Date.now(),
         detalle = []
     } = datos;
+
+    const nombreCliente = String(nombre_cliente).trim();
+    if (!nombreCliente) {
+        return callback(new Error('El nombre del cliente es obligatorio'), null);
+    }
 
     validarStockOrden(detalle, (errVal, calculo) => {
         if (errVal) return callback(errVal, null);
@@ -132,41 +137,33 @@ function crearVenta(datos, callback) {
                 }
 
                 const item = itemsVerificados[indice];
-                db.query(
-                    'UPDATE producto SET cantidad = cantidad - ?, fecha_modificacion = NOW() WHERE id = ?',
-                    [item.cantidad, item.producto_id],
-                    (errStock) => {
-                        if (errStock) return db.rollback(() => callback(errStock, null));
-                        actualizarStock(indice + 1);
-                    }
-                );
+                productoModel.descontarStock(item.producto_id, item.cantidad, (errStock) => {
+                    if (errStock) return db.rollback(() => callback(errStock, null));
+                    actualizarStock(indice + 1);
+                });
             }
 
             // 2. Registra movimiento financiero (ingreso)
             function registrarMovimiento() {
-                db.query(
-                    `INSERT INTO movimiento_financiero (tipo_movimiento, monto, fecha, descripcion, referencia_paypal)
-                     VALUES ('ingreso', ?, NOW(), ?, ?)`,
-                    [total, `Venta PayPal (${orden_paypal_id}) - ${nombre_cliente}`, orden_paypal_id],
+                movimientoModel.insertarIngresoVenta(
+                    total,
+                    `Venta (${orden_paypal_id}) - ${nombreCliente}`,
+                    orden_paypal_id,
                     (errMov) => {
                         if (errMov) return db.rollback(() => callback(errMov, null));
 
-                    // 3. Genera Factura Electronica XML CFDI 4.0
-                    const facturaXML = generarFacturaXML({
-                        folio: 'CFDI-' + Date.now().toString().slice(-6),
-                        subtotal,
-                        iva,
-                        total,
-                        cliente: { nombre: nombre_cliente, correo: correo_cliente },
-                        detalle: itemsVerificados
-                    });
+                        // 3. Genera Factura Electronica XML CFDI 4.0
+                        const facturaXML = generarFacturaXML({
+                            folio: 'CFDI-' + Date.now().toString().slice(-6),
+                            subtotal,
+                            iva,
+                            total,
+                            cliente: { nombre: nombreCliente, correo: correo_cliente },
+                            detalle: itemsVerificados
+                        });
 
-                    // 4. Inserta en factura
-                    db.query(
-                        `INSERT INTO factura (cliente_id, orden_paypal_id, fecha_emision, archivo_xml)
-                         VALUES (?, ?, NOW(), ?)`,
-                        [cliente_id || null, orden_paypal_id, facturaXML.xml],
-                        (errFac, resFac) => {
+                        // 4. Inserta en factura
+                        facturaModel.insertar(cliente_id || null, orden_paypal_id, facturaXML.xml, (errFac, resFac) => {
                             if (errFac) return db.rollback(() => callback(errFac, null));
 
                             db.commit((errCommit) => {
@@ -182,8 +179,7 @@ function crearVenta(datos, callback) {
                                     orden_paypal_id
                                 });
                             });
-                        }
-                    );
+                        });
                     }
                 );
             }
@@ -194,15 +190,7 @@ function crearVenta(datos, callback) {
 }
 
 function obtenerFacturaPorVenta(folio, clienteId, callback) {
-    let sql = 'SELECT * FROM factura WHERE (id = ? OR orden_paypal_id = ?)';
-    const parametros = [folio, folio];
-
-    if (clienteId) {
-        sql += ' AND cliente_id = ?';
-        parametros.push(clienteId);
-    }
-
-    db.query(sql, parametros, (error, rows) => {
+    facturaModel.buscarPorFolio(folio, clienteId, (error, rows) => {
         if (error) return callback(error, null);
         callback(null, rows[0] || null);
     });

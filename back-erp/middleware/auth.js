@@ -1,28 +1,8 @@
-const jwt = require('jsonwebtoken');
+//crea una autentificacion de usuario y maneja errores de peticiones
+const { ErrorHttp } = require('./errorHttp');
+const { verificarToken } = require('../services/auth.service');
 
-class ErrorHttp extends Error {
-    constructor(status, mensaje) {
-        super(mensaje);
-        this.status = status;
-    }
-}
-
-function secretoJWT() {
-    const secreto = process.env.JWT_SECRET;
-    if (!secreto || secreto.length < 32) {
-        throw new ErrorHttp(500, 'La clave JWT no esta configurada correctamente');
-    }
-    return secreto;
-}
-
-function emitirToken(usuario) {
-    return jwt.sign(
-        { id: usuario.id, rol: usuario.rol },
-        secretoJWT(),
-        { expiresIn: '8h' }
-    );
-}
-
+// Exige que la peticion traiga un token valido en el encabezado Authorization
 function exigirSesion(req, res, next) {
     const encabezado = req.get('authorization') || '';
     const [tipo, credencial] = encabezado.split(' ');
@@ -32,7 +12,7 @@ function exigirSesion(req, res, next) {
     }
 
     try {
-        req.usuario = jwt.verify(credencial, secretoJWT());
+        req.usuario = verificarToken(credencial);
         return next();
     } catch (error) {
         if (error instanceof ErrorHttp) {
@@ -42,6 +22,7 @@ function exigirSesion(req, res, next) {
     }
 }
 
+// Permite el paso solo a los roles indicados
 function soloPara(...roles) {
     return (req, res, next) => {
         if (!req.usuario || !roles.includes(req.usuario.rol)) {
@@ -51,6 +32,7 @@ function soloPara(...roles) {
     };
 }
 
+// Manejador global de errores
 function manejarErrores(error, req, res, next) {
     if (error instanceof ErrorHttp || error.status) {
         return res.status(error.status).json({ mensaje: error.message });
@@ -68,4 +50,4 @@ function manejarErrores(error, req, res, next) {
     return res.status(500).json({ mensaje: 'Error interno del servidor' });
 }
 
-module.exports = { ErrorHttp, emitirToken, exigirSesion, soloPara, manejarErrores };
+module.exports = { ErrorHttp, exigirSesion, soloPara, manejarErrores };

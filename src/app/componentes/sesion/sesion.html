@@ -35,6 +35,21 @@
           <input type="password" name="contrasena" [value]="contrasena" (input)="contrasena = $any($event.target).value" placeholder="••••••••">
         </div>
 
+        @if (mostrarRegistro) {
+          <div class="auth-terminos">
+            <input
+              type="checkbox"
+              [checked]="aceptoTerminos"
+              (change)="aceptoTerminos = $any($event.target).checked">
+            <span>
+              Acepto los
+              <button type="button" class="auth-enlace-terminos" (click)="legalService.abrirTerminos()">
+                Términos y Condiciones
+              </button>
+            </span>
+          </div>
+        }
+
         <button type="submit" class="btn-auth" [disabled]="cargando">
           {{ cargando ? 'Cargando...' : (!mostrarRegistro ? 'Iniciar Sesión' : 'Crear Cuenta') }}
         </button>

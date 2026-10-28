@@ -1,3 +1,4 @@
+//manda y recibe la información de PayPal al localStorage
 import { Injectable } from '@angular/core';
 import { CallbackHttp, postJSON } from './http-cliente';
 

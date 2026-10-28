@@ -1,3 +1,4 @@
+//manda la información de sesión al backend y la guarda en el localStorage
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CallbackHttp, postJSON } from './http-cliente';

@@ -1,3 +1,4 @@
+// Logica SQL para la tabla usuario
 const db = require('../config/db');
 
 // Modelo Usuario para operaciones de base de datos

@@ -1,3 +1,4 @@
+//conexiones a a controladores y middleware para la sesion
 const express = require('express');
 const router = express.Router();
 const SesionController = require('../controllers/sesion.controller');

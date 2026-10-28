@@ -116,6 +116,33 @@
   border-color: #556255;
 }
 
+.auth-terminos {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #3b423d;
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.auth-terminos input {
+  width: auto;
+  margin: 2px 0 0;
+  accent-color: #6f4e37;
+  cursor: pointer;
+}
+
+.auth-enlace-terminos {
+  background: none;
+  border: none;
+  color: #2a6496;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+}
+
 .btn-auth {
   background-color: #6f4e37;
   color: white;
